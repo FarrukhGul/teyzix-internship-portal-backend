@@ -1,6 +1,7 @@
 import express from 'express'
 
 import { adminLogin, getApplications, addInternship, deleteInternship } from '../controllers/adminController.js'
+import authMiddleWare from '../middleware/authMiddleware.js';
 
 
 
@@ -9,19 +10,19 @@ const adminRoutes = express.Router();
 
 
 
-// POST - /api/admin/login Admin can login
+// POST - /api/admin/login Admin can login    (PUBLIC)
 adminRoutes.post('/login', adminLogin)
 
 
-// POST - /api/admin/applications Admin can view the applications
-adminRoutes.get('/applications', getApplications)
 
+// ******************* PROTECTED ROUTES**********************
+// POST - /api/admin/applications Admin can view the applications
+adminRoutes.get('/applications', authMiddleWare, getApplications)
 
 // POST - /api/admin/internships Admin can post internships
-adminRoutes.post('/internships', addInternship)
-
+adminRoutes.post('/internships', authMiddleWare, addInternship)
 
 // POST - /api/admin/internships/:id Admin can delete the internships
-adminRoutes.delete('/internships/:id', deleteInternship)
+adminRoutes.delete('/internships/:id', authMiddleWare, deleteInternship)
 
 export default adminRoutes;

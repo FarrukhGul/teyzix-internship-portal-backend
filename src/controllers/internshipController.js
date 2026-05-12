@@ -32,10 +32,11 @@ export const getInternships = async (req, res) => {
 
 export const getInternshipsById = async (req, res) => {
     try {
+        // get id
         const {id } = req.params;
-
+        // check if its already exists
         const internshiById = await internshipModel.findById(id)
-
+        // if exists then status is 200 if not then 404
         if (internshiById) {
             return res.status(200).json({
                 success: true,

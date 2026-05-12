@@ -1,32 +1,130 @@
 import env from '../config/env.js'
 import jwt from 'jsonwebtoken'
+import applicationModel from '../models/application.model.js'
+import internshipModel from '../models/internship.model.js'
 
 
-export const adminLogin = async(req, res)=>{
+export const adminLogin = async (req, res) => {
 
-    try{
-        const {username, password} = req.body;
+    try {
+        const { username, password } = req.body;
 
         const adminUsername = env.ADMIN_USERNAME
         const adminPassword = env.ADMIN_PASSWORD
 
-        if(username !== adminUsername && adminPassword !== env.ADMIN_PASSWORD){
+        if (username !== adminUsername || password !== adminPassword) {
             return res.status(401).json({
-                success : false,
-                message : "Ivalid Username or Password,,,"
+                success: false,
+                message: "Invalid Username or Password"
+            })
+        } else {
+            const token = jwt.sign(
+                { role: 'admin' },
+                env.JWT_SECRET,
+                { expiresIn: env.JWT_SECRET_EXPIRE }
+            )
+
+            return res.status(200).json({
+                success: true,
+                token
+            })
+        };
+
+    }
+
+    catch(e){
+    console.error("adminLogin error:", e.message)
+    return res.status(500).json({
+        success: false,
+        message: "Server Error."
+    })
+}
+}
+
+export const getApplications = async (req, res) => {
+    try{
+        // find all applications
+      const applications = await applicationModel.find(); 
+       // check if applications doesnot exists
+       if(applications.length !== 0){
+        return  res.status(200).json({
+            success : true,
+            data : applications
+        })
+       }
+
+       else {
+        return res.status(404).json({
+            success : false,
+            message : "Application does not exists.",
+        })
+       }
+
+    }
+        catch(e){
+    console.error("Application error:", e.message)
+    return res.status(500).json({
+        success: false,
+        message: "Server Error."
+    })
+}
+}
+
+export const addInternship = async (req, res) => {
+      try{
+        const {title, description, domain, duration, stipend, slots, isOpen} = req.body
+        
+        const internships = await internshipModel.create({
+            title,
+            description,
+            domain,
+            duration,
+            stipend,
+            slots,
+            isOpen
+        });
+
+        return res.status(201).json({
+            success : true,
+            data : internships
+        })
+    }
+        catch(e){
+    console.error("Application error:", e.message)
+    return res.status(500).json({
+        success: false,
+        message: "Server Error."
+    })
+}
+}
+
+export const deleteInternship = async (req, res) => {
+    try{
+        const {id} = req.params;
+        const deletedInternship = await internshipModel.findByIdAndDelete(id);
+
+         // 404 check if internship does not exist
+        if(!deletedInternship){
+            return res.status(404).json({
+                success: false,
+                message: "Internship not found"
             })
         }
+
+
+        return res.status(200).json({
+            success : true,
+            message : " Internship deleted successfully",
+            deletedInternship
+        })
+
     }
-}
 
-export const getApplications = async(req, res)=>{
-    
-}
-
-export const addInternship = async(req, res)=>{
-    
-}
-
-export const deleteInternship = async(req, res)=>{
-    
+    catch(e){
+        console.error("Delete Internship erro.", e.message);
+        return res.status(500).json({
+            success : false,
+            message : " Server Error",
+        })
+    }
 }
