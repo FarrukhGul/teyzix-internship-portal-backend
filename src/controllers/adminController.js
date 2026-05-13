@@ -2,6 +2,7 @@ import env from '../config/env.js'
 import jwt from 'jsonwebtoken'
 import applicationModel from '../models/application.model.js'
 import internshipModel from '../models/internship.model.js'
+import blacklistModel from '../models/blacklist.model.js'
 
 
 export const adminLogin = async (req, res) => {
@@ -32,48 +33,48 @@ export const adminLogin = async (req, res) => {
 
     }
 
-    catch(e){
-    console.error("adminLogin error:", e.message)
-    return res.status(500).json({
-        success: false,
-        message: "Server Error."
-    })
-}
+    catch (e) {
+        console.error("adminLogin error:", e.message)
+        return res.status(500).json({
+            success: false,
+            message: "Server Error."
+        })
+    }
 }
 
 export const getApplications = async (req, res) => {
-    try{
+    try {
         // find all applications
-      const applications = await applicationModel.find(); 
-       // check if applications doesnot exists
-       if(applications.length !== 0){
-        return  res.status(200).json({
-            success : true,
-            data : applications
-        })
-       }
+        const applications = await applicationModel.find();
+        // check if applications doesnot exists
+        if (applications.length !== 0) {
+            return res.status(200).json({
+                success: true,
+                data: applications
+            })
+        }
 
-       else {
-        return res.status(404).json({
-            success : false,
-            message : "Application does not exists.",
-        })
-       }
+        else {
+            return res.status(404).json({
+                success: false,
+                message: "Application does not exists.",
+            })
+        }
 
     }
-        catch(e){
-    console.error("Application error:", e.message)
-    return res.status(500).json({
-        success: false,
-        message: "Server Error."
-    })
-}
+    catch (e) {
+        console.error("Application error:", e.message)
+        return res.status(500).json({
+            success: false,
+            message: "Server Error."
+        })
+    }
 }
 
 export const addInternship = async (req, res) => {
-      try{
-        const {title, description, domain, duration, stipend, slots, isOpen} = req.body
-        
+    try {
+        const { title, description, domain, duration, stipend, slots, isOpen } = req.body
+
         const internships = await internshipModel.create({
             title,
             description,
@@ -85,26 +86,26 @@ export const addInternship = async (req, res) => {
         });
 
         return res.status(201).json({
-            success : true,
-            data : internships
+            success: true,
+            data: internships
         })
     }
-        catch(e){
-    console.error("Application error:", e.message)
-    return res.status(500).json({
-        success: false,
-        message: "Server Error."
-    })
-}
+    catch (e) {
+        console.error("Application error:", e.message)
+        return res.status(500).json({
+            success: false,
+            message: "Server Error."
+        })
+    }
 }
 
 export const deleteInternship = async (req, res) => {
-    try{
-        const {id} = req.params;
+    try {
+        const { id } = req.params;
         const deletedInternship = await internshipModel.findByIdAndDelete(id);
 
-         // 404 check if internship does not exist
-        if(!deletedInternship){
+        // 404 check if internship does not exist
+        if (!deletedInternship) {
             return res.status(404).json({
                 success: false,
                 message: "Internship not found"
@@ -113,18 +114,42 @@ export const deleteInternship = async (req, res) => {
 
 
         return res.status(200).json({
-            success : true,
-            message : " Internship deleted successfully",
+            success: true,
+            message: " Internship deleted successfully",
             deletedInternship
         })
 
     }
 
-    catch(e){
+    catch (e) {
         console.error("Delete Internship erro.", e.message);
         return res.status(500).json({
-            success : false,
-            message : " Server Error",
+            success: false,
+            message: " Server Error",
+        })
+    }
+}
+
+export const adminLogout = async (req, res) => {
+    try {
+        // get token from headers
+        const token = req.headers.authorization?.split(" ")[1];
+
+        // save in db token blacklist.
+        await blacklistModel.create({ token })
+
+        return res.status(200).json({
+            success: true,
+            message: "Logged out successfully"
+        })
+
+    }
+
+    catch (e) {
+        console.error("Logout error:", e.message)
+        return res.status(500).json({
+            success: false,
+            message: "Server Error"
         })
     }
 }

@@ -1,7 +1,7 @@
 import applicationModel from "../models/application.model.js";
 
 
-export const sendApplication = async (req, res) => {
+const sendApplication = async (req, res) => {
     try {
         const { name, email, phoneNumber, selectedDomain, message } = req.body
 
@@ -31,3 +31,6 @@ export const sendApplication = async (req, res) => {
     })
     }
 }
+
+
+export default sendApplication;

@@ -1,10 +1,11 @@
 import jwt from 'jsonwebtoken'
 import env from '../config/env.js'
+import blacklistModel from '../models/blacklist.model.js'
 
 
 
 
-const authMiddleWare = (req, res, next) => {
+const authMiddleWare = async(req, res, next) => {
     // get token from headers 
     const authHeaders = req.headers.authorization;
     // BEARER, .... token so thats why we split
@@ -21,6 +22,16 @@ const authMiddleWare = (req, res, next) => {
     // verify the token
     try {
         const decoded = jwt.verify(token, env.JWT_SECRET);
+
+        // check blacklist
+        const isBlackListed = await blacklistModel.findOne({ token })
+
+        if (isBlackListed) {
+             return res.status(401).json({
+            success: false,
+            message: "Token blacklisted. Please login again."
+        });
+        }
         req.admin = decoded;
         next();
     }

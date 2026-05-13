@@ -1,6 +1,6 @@
 import express from 'express'
 
-import { adminLogin, getApplications, addInternship, deleteInternship } from '../controllers/adminController.js'
+import { adminLogin, getApplications, addInternship, deleteInternship, adminLogout } from '../controllers/adminController.js'
 import authMiddleWare from '../middleware/authMiddleware.js';
 
 
@@ -24,5 +24,9 @@ adminRoutes.post('/internships', authMiddleWare, addInternship)
 
 // POST - /api/admin/internships/:id Admin can delete the internships
 adminRoutes.delete('/internships/:id', authMiddleWare, deleteInternship)
+
+// POST - /api/admin/logout Admin can  securely logout using token blaclklisting tchnique
+adminRoutes.post('/logout', authMiddleWare, adminLogout)
+
 
 export default adminRoutes;
