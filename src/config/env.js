@@ -7,7 +7,8 @@ const env = {
     ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
     JWT_SECRET: process.env.JWT_SECRET,
     PORT: process.env.PORT || 3000,
-    JWT_SECRET_EXPIRE : process.env.JWT_SECRET_EXPIRE
+    JWT_SECRET_EXPIRE : process.env.JWT_SECRET_EXPIRE,
+    FRONTEND_URL : process.env.FRONTEND_URL
 }
 
 // validation.. like if any variable is missing, we can throw the error for better debugging.
@@ -17,6 +18,7 @@ if (!env.ADMIN_PASSWORD) throw new Error("ADMIN PASSWORD is missing in .env")
 if (!env.JWT_SECRET) throw new Error("JWT SECRET Key is missing in .env")
 if (!env.PORT) throw new Error("PORT is missing in .env")
 if (!env.JWT_SECRET_EXPIRE) throw new Error("JWT SECRET EXPIRY is missing in .env")
+if (!env.FRONTEND_URL) throw new Error("Front end url is missing in .env")
     
 
 export default env;
