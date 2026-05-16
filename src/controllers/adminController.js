@@ -3,45 +3,36 @@ import jwt from 'jsonwebtoken'
 import applicationModel from '../models/application.model.js'
 import internshipModel from '../models/internship.model.js'
 import blacklistModel from '../models/blacklist.model.js'
+import bcrypt from 'bcryptjs'
 
 
 export const adminLogin = async (req, res) => {
+  try {
+    const { username, password } = req.body
 
-    try {
-        const { username, password } = req.body;
-
-        const adminUsername = env.ADMIN_USERNAME
-        const adminPassword = env.ADMIN_PASSWORD
-
-        if (username !== adminUsername || password !== adminPassword) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid Username or Password"
-            })
-        } else {
-            const token = jwt.sign(
-                { role: 'admin' },
-                env.JWT_SECRET,
-                { expiresIn: env.JWT_SECRET_EXPIRE }
-            )
-
-            return res.status(200).json({
-                success: true,
-                token
-            })
-        };
-
+    const admin = await adminModel.findOne({ username })
+    if (!admin) {
+      return res.status(401).json({ success: false, message: "Invalid Username or Password" })
     }
 
-    catch (e) {
-        console.error("adminLogin error:", e.message)
-        return res.status(500).json({
-            success: false,
-            message: "Server Error."
-        })
+    const isMatch = await bcrypt.compare(password, admin.password)
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: "Invalid Username or Password" })
     }
+
+    const token = jwt.sign(
+      { role: 'admin', id: admin._id },
+      env.JWT_SECRET,
+      { expiresIn: env.JWT_SECRET_EXPIRE }
+    )
+
+    return res.status(200).json({ success: true, token })
+
+  } catch (e) {
+    console.error("adminLogin error:", e.message)
+    return res.status(500).json({ success: false, message: "Server Error." })
+  }
 }
-
 export const getApplications = async (req, res) => {
     try {
         // find all applications
