@@ -12,7 +12,7 @@ adminRoutes.post('/login', adminLogin)
 // GET - /api/admin/applications Admin can view the applications
 adminRoutes.get('/applications', authMiddleWare, getApplications)
 
-// POST - /api/admin/applications/:id/analyze — Analyze resume from the Gemini
+// POST - /api/admin/applications/:id/analyze  Analyze resume from the Gemini
 adminRoutes.post('/applications/:id/analyze', authMiddleWare, analyzeApplication)
 
 // POST - /api/admin/internships Admin can post internships
