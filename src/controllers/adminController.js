@@ -6,6 +6,47 @@ import blacklistModel from '../models/blacklist.model.js'
 import bcrypt from 'bcryptjs'
 import adminModel from '../models/admin.model.js'
 
+import { PDFParse } from 'pdf-parse'
+import analyzeResume from '../services/geminiService.js'
+
+
+export const analyzeApplication = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        // Step 1: find the Application
+        const application = await applicationModel.findById(id)
+        if (!application) {
+            return res.status(404).json({ success: false, message: 'Application not found' })
+        }
+
+        // Step 2:check the Resume URL 
+        if (!application.resumeUrl) {
+            return res.status(400).json({ success: false, message: 'No resume uploaded' })
+        }
+        // Step 3: download PDF from Cloudinary  
+        const response = await fetch(application.resumeUrl)
+        const arrayBuffer = await response.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
+
+        // Step 4: extract text from PDF 
+        const parser = new PDFParse({ url: application.resumeUrl })
+        const pdfData = await parser.getText()
+        const resumeText = pdfData.text
+        // Step 5: Analyze frmo gemini
+        const analysis = await analyzeResume(resumeText, application.selectedDomain)
+
+        return res.status(200).json({
+            success: true,
+            analysis
+        })
+
+    } catch (e) {
+        console.error('analyzeApplication error:', e.message)
+        res.status(500).json({ success: false, message: 'Server Error' })
+    }
+}
+
 export const adminLogin = async (req, res) => {
     try {
         const { username, password } = req.body

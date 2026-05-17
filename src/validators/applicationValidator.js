@@ -5,5 +5,5 @@ export const applicationValidator = z.object({
     email: z.string().email("Invalid email format"),
     phoneNumber: z.string().min(10, "Invalid phone number").max(15, "Invalid phone number"),
     selectedDomain: z.string().min(1, "Please select a domain"),
-    message: z.string().min(20, "Message must be at least 20 characters").max(100, "Message cannot exceed to 100 words.")
+    message: z.string().min(20, "Message must be at least 20 characters").max(500, "Message cannot exceed 500 characters.")
 }) 
