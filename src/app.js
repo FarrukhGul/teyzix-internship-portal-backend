@@ -11,12 +11,18 @@ const app = express();
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'https://teyzix-internship-portal-frontend.vercel.app',
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }))
+
+app.options('*', cors())
+
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
+  crossOriginResourcePolicy: false,
+  crossOriginOpenerPolicy: false,
+  crossOriginEmbedderPolicy: false,
 }))
+
 app.use(express.json())
 
 app.use('/api/internships', internshipRoutes);
